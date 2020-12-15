@@ -13,7 +13,7 @@ _You don't need to install this program! Execute .exe file and enjoy._
   2. "svg" - export your chromatograms into SVG files
   3. "diff_type" - export your chromatograms in other filetype (currently supported formats: PDF, JPG, JPEG)
   4. "exit" - exiting from program
-  5. "help" - output list of avaliable commands
+  5. "help" - display list of avaliable commands
 * Type listed above commands that you need and follow the instructions from console
 
 If you had any issues - write me on e-mail: makhonin.a.ru@gmail.com
