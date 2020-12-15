@@ -5,13 +5,13 @@ Export your chromatography RAW file from Chromeleon to picture
 _You don't need to install this program! Execute .exe file and enjoy._
 
 * First of all, export from Chromeleon chromatograms in RAW format.
-* Then put them all in the same directory with .exe
+* Then put them all in the same directory with .exe file
 * Execute .exe file
 * This program has CLI (Command Line Interface), so after executing console will be opened
 * This interface has some commands:
   1. "png" - export your chromatograms into PNG pictures
   2. "svg" - export your chromatograms into SVG files
-  3. "diff_type" - export your chromatograms in other filetype (currentl supported formats: PDF, JPG, JPEG)
+  3. "diff_type" - export your chromatograms in other filetype (currently supported formats: PDF, JPG, JPEG)
   4. "exit" - exiting from program
   5. "help" - output list of avaliable commands
 * Type listed above commands that you need and follow the instructions from console
