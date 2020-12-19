@@ -12,6 +12,8 @@ Export your chromatography RAW file from Chromeleon to picture
 
 * "README.md" - instructions
 
+* "test.py" - test script of new program version  
+
 # How to use
 _You don't need to install this program! Execute .exe file and enjoy._
 
