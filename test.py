@@ -20,6 +20,7 @@ import os
 plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['font.family'] = 'Calibri'
 
+# Default values of variables to change in program
 min_time = 15
 max_time = 45
 dest = os.getcwd()
@@ -35,7 +36,7 @@ def changer(x):
 
 
 # The main function that exports pictures
-def print_fig(form, min_time, max_time):
+def print_fig(form, min_time, max_time, dest):
     # Iteration of all files in "path"
     for dirpath, dirnames, filenames in os.walk("."):
         for filename in filenames:
@@ -132,87 +133,94 @@ def print_fig(form, min_time, max_time):
 
 
 # Command line (Cmd) class
-class YourCmdSubclass(Cmd):
+class CLI(Cmd):
     """Make your txt chromatogramm into beautiful graph"""
+    def __init__(self):
+        Cmd.__init__(self)
+        self.prompt = "> "
+        self.intro = '''\n\n\n\n\n> Welcome to ChromoGraph version 0.1.2-beta
+> For more info type "help"'''
+        self.doc_header ="> avaliable comands (type 'help _command_' for more info about specific command)"
 
-    def do_export(*args):
-        """Export in different format"""
-        print("enter your format")
-        form = input("Format: ")
-        print(f"Exporting in {form}")
-        print_fig(form, min_time, max_time)  # , path, dest)
+    def default(self, line):
+        print("> Command doesn't exists")
+
+    def do_export(self, args):
+        """Export your file in graph"""
+        print("> Enter your format")
+        form = input("> Format: ")
+        print(f"> Exporting in {form}")
+        print_fig(form, min_time, max_time, dest)  # , path, dest)
         return -1
 
-    def do_path(*args):
+    def do_path(self, args):
         """Change path to convert"""
-        print(f"Enter new path (current path: {os.getcwd()}) or type \"back\" to exit")
-        cd = input("New path: ")
+        print(f"> Enter new path (current path: {os.getcwd()}) or type \"back\" to exit")
+        cd = input("> New path: ")
         if cd == "back":
             return 0
         os.chdir(cd)
-        print(f"successfully changed path to {os.getcwd()}")
+        print(f"> successfully changed path to {os.getcwd()}")
         return 0
 
-    def do_time(*args):
+    def do_time(self, args):
         """Change start and end time for graph"""
-        print("choose your start time in min or type \"back\" to exit")
-        ct = input('default start - 15 min, end - 45 min:\t')
+        print("> choose your start time in min or type \"back\" to exit")
+        ct = input('> default start - 15 min, end - 45 min:\t')
         if ct == "back":
             return 0
 
         global min_time, max_time
         min_time = float(ct)
-        print("Choose your end time")
+        print("> Choose your end time")
         max_time = float(input("End: "))
         return 0
 
-    def do_dest(*args):
+    def do_dest(self, args):
         """Change export destination"""
         global dest
-        print(f"Enter new export destination or type \"back\", default {dest}")
-        nd = input("New destination: ")
+        print(f"> Enter new export destination or type \"back\", default {dest}")
+        nd = input("> New destination: ")
 
         if nd == "back":
             return 0
 
         if os.path.exists(nd):
             dest = nd
-            print(f"successfully changed destination to {dest}")
+            print(f"> successfully changed destination to {dest}")
             return 0
 
-        yn = input("This directory doesn't exists, make new? [Y/n]? ")
+        yn = input("> This directory doesn't exists, make new? [Y/n]? ")
         listy = ['y', 'yes', 'ye']
 
         if yn.lower() in listy:
             os.mkdir(nd)
             dest = nd
-            print(f"successfully changed destination to {dest}")
+            print(f"> successfully changed destination to {dest}")
             return 0
         else:
-            print("destination hasn't changed")
+            print("> destination hasn't changed")
             return 0
 
-    def do_exit(*args):
+    def do_exit(self, args):
         """Exit command"""
         global Tr
         Tr = False
-        print('Thank you for using!')
+        print('\n> Thank you for using!')
         return -1
 
 
 if __name__ == '__main__':
     Tr = True
+    c = CLI()
+    # c.onecmd("startup")
     while Tr:
         try:
-            c = YourCmdSubclass()
-            command = ' '.join(sys.argv[1:])
-            if command:
-                sys.exit(c.onecmd(command))
             c.cmdloop()
         except ValueError:
-            print("This format isn't supported")
+            print("\n> This format isn't supported")
         except FileNotFoundError:
-            print("This directory doesn't exist")
+            print("\n> Directory doesn't exist")
         except KeyboardInterrupt:
             Tr = False
-            print('Thank you for using!')
+            print('\n> Thank you for using!')
