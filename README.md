@@ -1,7 +1,10 @@
+
 # ChromoGraph
+
 Export your chromatography RAW file from Chromeleon to picture
 
 # included files
+
 * "ChromoGraph.exe" - program for executing
 
 * "ChromoGraph.py" - source code
@@ -12,9 +15,8 @@ Export your chromatography RAW file from Chromeleon to picture
 
 * "README.md" - instructions
 
-* "test.py" - test script of new program version  
-
 # How to use
+
 _You don't need to install this program! Execute .exe file and enjoy._
 
 * First of all, export from Chromeleon chromatograms in RAW format.
