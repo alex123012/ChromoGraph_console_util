@@ -10,13 +10,14 @@ from cmd import Cmd
 import pandas as pd
 import numpy as np
 import unidecode
-import argparse
-import sys
 import os
 
 # plt.rcParams['pgf.texsystem'] = 'pdflatex'
-plt.rcParams['pdf.fonttype'] = 42
-plt.rcParams['font.family'] = 'Calibri'
+
+# Default values of variables to change in program
+min_time = 15
+max_time = 45
+dest = os.getcwd()
 
 
 # crutch for bad windows unicode interpritation
@@ -25,31 +26,24 @@ def changer(x):
     if x[1].isdigit() or x[1] == '.':
         return x
     else:
-        return x.replace(x[1], '')
-
-
-def time_for_graph():
-    print("choose your start time")
-    min_time = float(input())
-    print("choose your end time")
-    max_time = float(input())
-    return min_time, max_time
+        while x[1].isdigit() != True:
+            x = x.replace(x[1], '')
+        return x
 
 
 # The main function that exports pictures
-def print_fig(form, min_time, max_time):
+def print_fig(form, min_time, max_time, dest):
     # Iteration of all files in "path"
     for dirpath, dirnames, filenames in os.walk("."):
         for filename in filenames:
             # finding specific files
             if 'UV_VIS_1.txt' in filename:
+                # print(dirnames)
 
                 filenamef = os.path.join(dirpath, filename)  # full filename
                 # decoding and changing file for normal python executing
                 with open(filenamef, 'r') as g:
                     f = str(g.read().replace(',', '.'))
-                    t = f.encode("utf-8")
-                    t = t.decode("utf-8")
                     t = unidecode.unidecode(f)
 
                 # Writing new file into old
@@ -68,6 +62,11 @@ def print_fig(form, min_time, max_time):
                 # Crutch (look above)
                 if df_ref[value].dtype != 'float':
                     df_ref[value] = df_ref[value].apply(changer)
+                
+                # Unsupported fonts in Windows (why?)
+                if os.name == 'nt':
+                    plt.rcParams['pdf.fonttype'] = 42
+                    plt.rcParams['font.family'] = 'Calibri'
 
                 # cutting off unnecessary time (slip and flushing)
                 df = df_ref[df_ref[time] >= min_time][
@@ -123,54 +122,106 @@ def print_fig(form, min_time, max_time):
                               label='VIS_1')
 
                 # Exporting file
-                filename = filename.replace('.txt', f'.{form}')
+                filename = f"{dest}/{filename.replace('.txt', f'.{form}')}"
+
                 fig.savefig(f"{filename}",
-                            format=f'{form}',
-                            quality=100)
+                            format=f'{form}',)
                 # Closing fig fore faster executing
-                print(f"successfully exported {filename}")
+                print(f"> successfully exported {filename}")
                 plt.close()
 
 
 # Command line (Cmd) class
-class YourCmdSubclass(Cmd):
+class CLI(Cmd):
     """Make your txt chromatogramm into beautiful graph"""
+    def __init__(self):
+        print('''> Welcome to ChromoGraph version 0.1.2-beta
+> For more info type "help"''')
+        Cmd.__init__(self)
+        self.prompt = "> "
+        self.doc_header = "> avaliable comands (type 'help _command_' for more info about specific command)"
 
-    def do_svg(*args):
-        """export in SVG format"""
-        print('Exporting in SVG')
-        min_time, max_time = time_for_graph()
-        form = 'svg'
-        print_fig(form, min_time, max_time)  # , path, dest)
+    def default(self, line):
+        print("> Command doesn't exists")
+
+    def do_export(self, args):
+        """Export your file in graph"""
+        print(">\n> Enter your format")
+        form = input("> Format: ")
+        print(f"> Exporting in {form}")
+        print_fig(form, min_time, max_time, dest)  # , path, dest)
         return -1
 
-    def do_png(*args):
-        """Export in PNG format"""
-        print('Exporting in PNG')
-        min_time, max_time = time_for_graph()
-        form = 'png'
-        print_fig(form, min_time, max_time)  # , path, dest)
+    def do_path(self, args):
+        """Change path to convert"""
+        print(f"> \n> Enter new path (current path: {os.getcwd()}) or type \"back\" to exit")
+        cd = input("> New path: ")
+        if cd == "back":
+            return 0
+        os.chdir(cd)
+        print(f"> successfully changed path to {os.getcwd()}")
+        return 0
+
+    def do_time(self, args):
+        """Change start and end time for graph"""
+        print("> \n> choose your start time in min or type \"back\" to exit")
+        ct = input('> default start - 15 min, end - 45 min:\t')
+        if ct == "back":
+            return 0
+
+        global min_time, max_time
+        min_time = float(ct)
+        print("> Choose your end time")
+        max_time = float(input("> End: "))
+        return 0
+
+    def do_dest(self, args):
+        """Change export destination"""
+        global dest
+        print(f"> \n> Enter new export destination or type \"back\", default {dest}")
+        nd = input("> New destination: ")
+
+        if nd == "back":
+            return 0
+
+        if os.path.exists(nd):
+            dest = nd
+            print(f"> successfully changed destination to {dest}")
+            return 0
+
+        yn = input("> This directory doesn't exists, make new? [Y/n]? ")
+
+        if yn.lower() in ['y', 'yes', 'ye']:
+            os.mkdir(nd)
+            dest = nd
+            print(f"> successfully changed destination to {dest}")
+            return 0
+        else:
+            print("> destination hasn't changed")
+            return 0
+
+    def do_exit(self, args):
+        """Exit command"""
+        global Tr
+        Tr = False
+        print('\n> Thank you for using!')
         return -1
 
-    def do_diff_type(*args):
-        """Export in different format"""
-        print("enter your format")
-        form = input()
-        min_time, max_time = time_for_graph()
-        print(f"Exporting in {form}")
-        print_fig(form, min_time, max_time)  # , path, dest)
-        return -1
 
-    def do_exit(*args):
-        return -1
-
-
+# Program run
 if __name__ == '__main__':
     try:
-        c = YourCmdSubclass()
-        command = ' '.join(sys.argv[1:])
-        if command:
-            sys.exit(c.onecmd(command))
-        c.cmdloop()
+        Tr = True
+        c = CLI()
+        while Tr:
+            try:
+                c.cmdloop()
+            # Exceptions
+            except ValueError:
+                print("\n> This format isn't supported")
+            except FileNotFoundError:
+                print("\n> Directory doesn't exist")
+            except Exception:
+                print("contact developer for this issue")
     except KeyboardInterrupt:
-        print('Thank you for using!')
+        print('\n> Thank you for using!')
