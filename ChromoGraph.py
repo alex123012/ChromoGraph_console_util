@@ -24,10 +24,22 @@ class CLI(Cmd):
 
     def do_export(self, *args):
         """Export your file in graph"""
-        fig.form = input(">\n> Enter your format: ")
+        file = input('> Enter your filename: ')
         print(f"> Exporting in {fig.form}")
         fig.export(file)
         return
+    
+    def do_serial_export(self, *args):
+        """export all files, containing template in name"""
+        direct = input('Enter your path with files: ')
+        template = input('Enter template for search (\
+if you want all files to convert - don\'t type anything): ')
+        if not template:
+            template = '.txt'
+        for dirpath, _, filenames in os.walk(direct):
+            for filename in filenames:       
+                if template in filename:
+                    fig.export(os.path.join(dirpath, filename))
 
     def do_time(self, *args):
         """Change start and end time for graph"""
@@ -41,7 +53,10 @@ class CLI(Cmd):
     
     def do_title(self, *args):
         """Changing graph title"""
-        fig.title = input('> Enter your graph title')
+        fig.title = input('> Enter your graph title: ')
+    
+    def do_format(self, *args):
+        fig.form = input(">\n> Enter your format: ")
 
     def do_exit(self, *args):
         """Exit command"""
@@ -64,7 +79,7 @@ if __name__ == '__main__':
                 print("\n> This format isn't supported")
             except FileNotFoundError:
                 print("\n> Directory doesn't exist")
-            except Exception:
-                print(Exception)
+            # except Exception:
+            #     print(Exception)
     except KeyboardInterrupt:
         print('\n> Thank you for using!')
