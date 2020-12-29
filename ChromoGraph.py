@@ -34,7 +34,7 @@ def changer(x):
 # The main function that exports pictures
 def print_fig(form, min_time, max_time, dest):
     # Iteration of all files in "path"
-    for dirpath, dirnames, filenames in os.walk("."):
+    for dirpath, _, filenames in os.walk("."):
         for filename in filenames:
             # finding specific files
             if 'UV_VIS_1.txt' in filename:
