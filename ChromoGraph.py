@@ -9,6 +9,8 @@ from package.ChromoGraph.chrofig import *
 
 fig = ChromoFigure()
 file = 'test_UV_VIS_1.txt'
+
+
 # Command line (Cmd) class
 class CLI(Cmd):
     """Make your txt chromatogramm into beautiful graph"""
@@ -17,7 +19,8 @@ class CLI(Cmd):
 > For more info type "help"''')
         Cmd.__init__(self)
         self.prompt = "> "
-        self.doc_header = "> avaliable comands (type 'help _command_' for more info about specific command)"
+        self.doc_header = "> avaliable comands (type 'help _command_' for \
+more info about specific command)"
 
     def default(self, line):
         print("> Command doesn't exists")
@@ -28,7 +31,7 @@ class CLI(Cmd):
         print(f"> Exporting in {fig.form}")
         fig.export(file)
         return
-    
+
     def do_serial_export(self, *args):
         """export all files, containing template in name"""
         direct = input('Enter your path with files: ')
@@ -37,7 +40,7 @@ if you want all files to convert - don\'t type anything): ')
         if not template:
             template = '.txt'
         for dirpath, _, filenames in os.walk(direct):
-            for filename in filenames:       
+            for filename in filenames:
                 if template in filename:
                     fig.export(os.path.join(dirpath, filename))
 
@@ -50,36 +53,33 @@ if you want all files to convert - don\'t type anything): ')
         fig.min_time = float(ct)
         fig.max_time = float(input("> Choose your end time: "))
         return
-    
+
     def do_title(self, *args):
         """Changing graph title"""
         fig.title = input('> Enter your graph title: ')
-    
+
     def do_format(self, *args):
         fig.form = input(">\n> Enter your format: ")
 
     def do_exit(self, *args):
         """Exit command"""
-        global Tr
-        Tr = False
-        print('\n> Thank you for using!')
+        raise KeyboardInterrupt
         return -1
 
 
 # Program run
 if __name__ == '__main__':
-    try:
-        Tr = True
-        c = CLI()
-        while Tr:
-            try:
-                c.cmdloop()
-            # Exceptions
-            except ValueError:
-                print("\n> This format isn't supported")
-            except FileNotFoundError:
-                print("\n> Directory doesn't exist")
-            # except Exception:
-            #     print(Exception)
-    except KeyboardInterrupt:
-        print('\n> Thank you for using!')
+    c = CLI()
+    while True:
+        try:
+            c.cmdloop()
+        # Exceptions
+        except ValueError:
+            print("\n> This format isn't supported")
+        except FileNotFoundError:
+            print("\n> Directory doesn't exist")
+        # except Exception:
+        #     print(Exception)
+        except KeyboardInterrupt:
+            print('\n> Thank you for using!')
+            break

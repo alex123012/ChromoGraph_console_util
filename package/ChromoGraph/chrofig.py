@@ -5,23 +5,25 @@ import tempfile
 import unidecode
 import os
 
+
 class ChromoFigure:
     """ Export RAW-file chromatoramm to picture graph"""
-    
+
     def __init__(self):
         self.__min_time = 15
         self.__max_time = 45
         self.__title = ''
         self.__format = 'png'
-        self.__temp_file = os.path.join(tempfile.gettempdir(), f'tmp_{self.__title}')
-    
+        self.__temp_file = os.path.join(tempfile.gettempdir(),
+                                        f'tmp_{self.__title}')
+
     @staticmethod
     def changer(x):
         """For bad unidecodeing in Windows"""
         if x[1].isdigit() or x[1] == '.':
             return x
         else:
-            while x[1].isdigit() != True:
+            while not x[1].isdigit():
                 x = x.replace(x[1], '')
             return x
 
@@ -33,24 +35,24 @@ class ChromoFigure:
 
     @min_time.setter
     def min_time(self, x):
-        
         self.__min_time = x
+
     @min_time.getter
     def min_time(self):
         return self.__min_time
 
-
     @max_time.setter
     def max_time(self, x):
         self.__max_time = x
+
     @max_time.getter
     def max_time(self):
         return self.__max_time
 
-
     @title.setter
     def title(self, x):
         self.__title = x
+
     @title.getter
     def title(self):
         return self.__title
@@ -58,6 +60,7 @@ class ChromoFigure:
     @form.setter
     def form(self, x):
         self.__format = x
+
     @form.getter
     def form(self):
         return self.__format
@@ -65,10 +68,10 @@ class ChromoFigure:
     @tmpfile.setter
     def tmpfile(self, x):
         self.__temp_file = x
+
     @tmpfile.getter
     def tmpfile(self):
         return self.__temp_file
-
 
     def export(self, file):
         """Exporting chromatogramm into picture with your settings"""
@@ -84,15 +87,15 @@ class ChromoFigure:
 
         # Reading new file
         df_ref = pd.DataFrame(pd.read_csv(self.__temp_file,
-                                sep='\t',
-                                skiprows=42))
+                                          sep='\t',
+                                          skiprows=42))
         # Crutch for bad unidecoding
         if df_ref[value].dtype != 'float':
-                    df_ref[value] = df_ref[value].apply(ChromoFigure.changer)
+            df_ref[value] = df_ref[value].apply(ChromoFigure.changer)
 
         # cutting off unnecessary time (slip and flushing)
         df = df_ref[df_ref[time] >= self.__min_time][
-                    [time, value]].astype('float')
+            [time, value]].astype('float')
         df = df[df[time] <= self.__max_time]
 
         # Coordinates for graph
@@ -106,27 +109,27 @@ class ChromoFigure:
 
         # Initializing graph
         fig, ax = plt.subplots(1, 1,
-                                figsize=(15, 10),
-                                tight_layout=True)
+                               figsize=(15, 10),
+                               tight_layout=True)
 
         # Graph customization
         ax.set_title(self.__title,
-                        fontsize=25,
-                        color='black',
-                        pad=10)
+                     fontsize=25,
+                     color='black',
+                     pad=10)
 
         ax.set_xlabel('Time (min)',
-                        fontsize=25,
-                        color='black',
-                        labelpad=10)
+                      fontsize=25,
+                      color='black',
+                      labelpad=10)
         ax.set_ylabel('Absorbance (mAU)',
-                        fontsize=25,
-                        color='black',
-                        labelpad=10)
+                      fontsize=25,
+                      color='black',
+                      labelpad=10)
         ax.yaxis.set_ticks(
             np.arange(round(miny, -2),
-                        round(maxy, -2) + 100,
-                        rnd))
+                      round(maxy, -2) + 100,
+                      rnd))
         ax.xaxis.set_ticks(
             np.arange(self.__min_time, self.__max_time + 1, 3))
 
@@ -139,9 +142,9 @@ class ChromoFigure:
 
         # Plotting
         ax = plt.plot(x, y, '-',
-                        color='black',
-                        markersize=1,
-                        label='VIS_1')
+                      color='black',
+                      markersize=1,
+                      label='VIS_1')
 
         # Exporting file
         filename = f"{file.replace('.txt', f'.{self.__format}')}"
