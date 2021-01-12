@@ -9,78 +9,45 @@ import os
 class ChromoFigure:
     """ Export RAW-file chromatoramm to picture graph"""
 
+    format_list = ['png', 'svg', 'jpg', 'jpeg', 'pdf']
+
     def __init__(self):
         self.__min_time = 15
         self.__max_time = 45
         self.__title = ''
         self.__format = 'png'
         self.__temp_file = os.path.join(tempfile.gettempdir(),
-                                        f'tmp_{self.__title}')
+                                        tempfile.NamedTemporaryFile().name)
 
-    @staticmethod
-    def changer(x):
+    def __changer(self, x):
+
         """For bad unidecodeing in Windows"""
-        if x[1].isdigit() or x[1] == '.':
-            return x
-        else:
-            while not x[1].isdigit():
-                x = x.replace(x[1], '')
-            return x
 
-    min_time = property(doc="Start time for graph")
-    max_time = property(doc="End time for graph")
-    title = property(doc='Title on the top of the graph')
-    form = property(doc='Format to export')
-    tmpfile = property(doc='Temp file to write temporary result file')
+        y = ''
+        for i in x:
+            if i.isdigit() or i == '.':
+                y += i
+        return float(y)
 
-    @min_time.setter
-    def min_time(self, x):
-        self.__min_time = x
+    def settings(self):
+        print(f'min_time = {self.min_time}')
+        print(f'max_time = {self.max_time}')
+        print(f'Title = {self.title}' if self.title else 'No title')
+        print(f'format = {self.form}')
+        print(f'Tempfile directory = {self.tmpfile}')
 
-    @min_time.getter
-    def min_time(self):
-        return self.__min_time
+    def __file_normalize(self, file):
 
-    @max_time.setter
-    def max_time(self, x):
-        self.__max_time = x
+        '''decoding and changing file for normal python executing'''
 
-    @max_time.getter
-    def max_time(self):
-        return self.__max_time
-
-    @title.setter
-    def title(self, x):
-        self.__title = x
-
-    @title.getter
-    def title(self):
-        return self.__title
-
-    @form.setter
-    def form(self, x):
-        self.__format = x
-
-    @form.getter
-    def form(self):
-        return self.__format
-
-    @tmpfile.setter
-    def tmpfile(self, x):
-        self.__temp_file = x
-
-    @tmpfile.getter
-    def tmpfile(self):
-        return self.__temp_file
-
-    def export(self, file):
-        """Exporting chromatogramm into picture with your settings"""
-        # decoding and changing file for normal python executing
         with open(file, 'r') as f:
             tmp = unidecode.unidecode(str(f.read().replace(',', '.')))
-        # Writing new file into old
+
+        # Writing new file into temp file
         with open(self.__temp_file, 'w') as f:
             f.write(tmp)
+
+    def __file_read(self):
         # Variable for easy debug
         time = "Time (min)"
         value = "Value (mAU)"
@@ -91,16 +58,25 @@ class ChromoFigure:
                                           skiprows=42))
         # Crutch for bad unidecoding
         if df_ref[value].dtype != 'float':
-            df_ref[value] = df_ref[value].apply(ChromoFigure.changer)
+            df_ref[value] = df_ref[value].apply(self.__changer)
 
         # cutting off unnecessary time (slip and flushing)
         df = df_ref[df_ref[time] >= self.__min_time][
             [time, value]].astype('float')
         df = df[df[time] <= self.__max_time]
 
-        # Coordinates for graph
         x = df[time].tolist()
         y = df[value].tolist()
+        return x, y
+
+    def export(self, file):
+
+        """Exporting chromatogramm into picture with your settings"""
+
+        self.__file_normalize(file)
+
+        # Coordinates for graph)
+        x, y = self.__file_read()
 
         # Variables for more readable code
         miny = min(y)
@@ -154,3 +130,51 @@ class ChromoFigure:
         # Closing fig fore faster executing
         print(f"> successfully exported {file}")
         plt.close()
+
+    min_time = property(doc="Start time for graph")
+    max_time = property(doc="End time for graph")
+    title = property(doc='Title on the top of the graph')
+    form = property(doc='Format to export')
+    tmpfile = property(doc='Temp file to write temporary result file')
+
+    @min_time.setter
+    def min_time(self, x):
+        self.__min_time = x
+
+    @min_time.getter
+    def min_time(self):
+        return self.__min_time
+
+    @max_time.setter
+    def max_time(self, x):
+        self.__max_time = x
+
+    @max_time.getter
+    def max_time(self):
+        return self.__max_time
+
+    @title.setter
+    def title(self, x):
+        self.__title = x
+
+    @title.getter
+    def title(self):
+        return self.__title
+
+    @form.setter
+    def form(self, x):
+        if x not in format_list:
+            raise TypeError
+        self.__format = x
+
+    @form.getter
+    def form(self):
+        return self.__format
+
+    @tmpfile.setter
+    def tmpfile(self, x):
+        self.__temp_file = os.path.join(tempfile.gettempdir(), x)
+
+    @tmpfile.getter
+    def tmpfile(self):
+        return self.__temp_file

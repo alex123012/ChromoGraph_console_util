@@ -8,7 +8,6 @@ from cmd import Cmd
 from package.ChromoGraph.chrofig import *
 
 fig = ChromoFigure()
-file = 'test_UV_VIS_1.txt'
 
 
 # Command line (Cmd) class
@@ -59,6 +58,7 @@ if you want all files to convert - don\'t type anything): ')
         fig.title = input('> Enter your graph title: ')
 
     def do_format(self, *args):
+        """Change export format"""
         fig.form = input(">\n> Enter your format: ")
 
     def do_exit(self, *args):
@@ -78,8 +78,8 @@ if __name__ == '__main__':
             print("\n> This format isn't supported")
         except FileNotFoundError:
             print("\n> Directory doesn't exist")
-        # except Exception:
-        #     print(Exception)
         except KeyboardInterrupt:
             print('\n> Thank you for using!')
             break
+        except Exception as err:
+            print(err)
