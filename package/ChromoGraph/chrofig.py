@@ -7,11 +7,11 @@ import os
 
 
 class ChromoFigure:
+
     """ Export RAW-file chromatoramm to picture graph"""
 
-    format_list = ['png', 'svg', 'jpg', 'jpeg', 'pdf']
-
     def __init__(self):
+        self.__format_list = ['png', 'svg', 'jpg', 'jpeg', 'pdf']
         self.__min_time = 15
         self.__max_time = 45
         self.__title = ''
@@ -30,6 +30,9 @@ class ChromoFigure:
         return float(y)
 
     def settings(self):
+
+        """Check your settings"""
+
         print(f'min_time = {self.min_time}')
         print(f'max_time = {self.max_time}')
         print(f'Title = {self.title}' if self.title else 'No title')
@@ -102,6 +105,7 @@ class ChromoFigure:
                       fontsize=25,
                       color='black',
                       labelpad=10)
+
         ax.yaxis.set_ticks(
             np.arange(round(miny, -2),
                       round(maxy, -2) + 100,
@@ -111,6 +115,7 @@ class ChromoFigure:
 
         ax.yaxis.set_tick_params(labelsize=22)
         ax.xaxis.set_tick_params(labelsize=22)
+
         ax.axis([self.__min_time - 1,
                 self.__max_time + 1,
                 miny - rnd / 2,
@@ -123,10 +128,12 @@ class ChromoFigure:
                       label='VIS_1')
 
         # Exporting file
-        filename = f"{file.replace('.txt', f'.{self.__format}')}"
+        filename = f"{file.replace('.txt',
+                      f'.{self.__format}')}"
 
         fig.savefig(f"{filename}",
                     format=f'{self.__format}',)
+
         # Closing fig fore faster executing
         print(f"> successfully exported {file}")
         plt.close()
@@ -163,7 +170,7 @@ class ChromoFigure:
 
     @form.setter
     def form(self, x):
-        if x not in format_list:
+        if x not in self.__format_list:
             raise TypeError
         self.__format = x
 
