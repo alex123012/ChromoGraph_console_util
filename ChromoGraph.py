@@ -32,7 +32,7 @@ more info about specific command)"
         """Export your file in graph"""
 
         file = input('> Enter your filename: ')
-        print(f"> Exporting in {fig.form}")
+        print(f"> Exporting in {fig.format}")
         fig.export(file)
         return
 
@@ -72,7 +72,7 @@ if you want all files to convert - don\'t type anything): ')
 
         """Change export format"""
 
-        fig.form = input(">\n> Enter your format: ")
+        fig.format = input(">\n> Enter your format: ")
 
     def do_exit(self, *args):
 
